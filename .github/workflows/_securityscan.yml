@@ -1,0 +1,33 @@
+name: Проверка Безопасности
+
+# Когда запускаем проверку
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Ручной запуск из интерфейса
+
+jobs:
+  security-check:
+    name: Сканирование уязвимостей
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Получаем код из репозитория
+      - name: Выгрузка кода
+        uses: actions/checkout@v4
+
+      # Запускаем Trivy для поиска уязвимостей
+      - name: Сканирование Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          # Сканируем файловую систему проекта
+          scan-type: 'fs'
+          scan-ref: '.'
+          # Выводим результат в виде таблицы
+          format: 'table'
+          # Прерываем выполнение при найденных уязвимостях
+          exit-code: '1'
+          # Ищем только серьезные и критические уязвимости
+          severity: 'HIGH,CRITICAL'
